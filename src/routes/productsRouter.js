@@ -49,7 +49,57 @@ router.get('/:id',async(req,res)=>{
     }
 })
 
-//router.post()
+router.post('/', async(req, res)=>{
+    const {title, description, code, price, stock,category,thumbnails} = req.body
+    try{
+        const prodToPost = await productManager.addProducts({
+            id: 'tbd',
+            title,
+            description,
+            code,
+            price,
+            status: true,
+            stock,
+            category,
+            thumbnails: thumbnails || 'tbd'
+        })
+        return res.status(200).json(prodToPost)
+    }catch(err){
+        return res.status(400).json({
+            error: `ERROR: No fue posible agregar el producto`,
+            message: err.message
+        })
+    }
+})  
+
+router.put('/:id',async(req,res)=>{
+    let id= req.params.id
+    let propsToUpdate = req.body
+    id=Number(id)
+    try{
+        let productUpdate = await productManager.updateProductById(id,propsToUpdate)
+        return res.status(200).json(productUpdate)
+    }catch(err){
+        return res.status(400).json({
+            error: `ERROR: No fue posible modificar el producto`,
+            message: err.message
+        })
+    }
+})
+
+router.delete('/:id', async(req,res)=>{
+    let id=req.params.id
+    id=Number(id)
+    try{
+        const prodToDelete = await productManager.deleteProductById(id)
+        res.status(200).json(prodToDelete)
+    }catch(err){
+        return res.status(400).json({
+            error: `ERROR: No fue posible modificar el producto`,
+            message: err.message
+        })
+    }
+})
 
 router.get("*",(req,res)=>{
     res.setHeader('Content-Type','application/json');

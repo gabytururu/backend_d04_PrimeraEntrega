@@ -19,10 +19,11 @@ class ProductManager {
     async addProduct(productObj){         
             const product = {
                 id: 'tbd',
+                status: true,
                 title: productObj.title, 
                 description: productObj.description,
                 price: productObj.price,
-                thumbnail: productObj.thumbnail,
+                thumbnails: productObj.thumbnails,
                 code: productObj.code,
                 stock: productObj.stock
             }
@@ -71,6 +72,9 @@ class ProductManager {
         }
 
         for(let prop in updatedPropsObj){
+            if (prop === 'id'){
+                return `Error: Actualización bloqueada. No es posible cambiar el id# de los productos. Intenta nuevamente, omite enviar datos de cambio de Id`
+            }
             if(prop !== 'id'){
                 allProducts[updateProductIndex][prop] = updatedPropsObj[prop]
             }
@@ -82,7 +86,7 @@ class ProductManager {
     async deleteProductById(id) {
         let allProducts = await this.getProducts()
         const productDeleteIndex = allProducts.findIndex(prod => prod.id === id)
-
+        
         if(productDeleteIndex === -1){
             return `ERROR: El producto que deseas borrar con el id#${id} no fue encontrado. Intenta nuevamente`
         }

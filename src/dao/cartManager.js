@@ -20,6 +20,12 @@ class CartManager{
     }
 
     async createCartWithProducts(productsArr){
+         //validations to avoid cart.products mochos creo van aca y no en router
+         //avoid pid or qty undefined
+
+         //creo esta va en otro endpoint
+         // add qty if pid already exist
+
         const cart ={
             cid:'tbd',
             products:productsArr
@@ -31,6 +37,8 @@ class CartManager{
         }else{
             cart.cid = carts[carts.length-1].cid + 1            
         }
+
+       
 
         carts.push(cart)        
         await fs.promises.writeFile(this.path, JSON.stringify(carts,null,2))
@@ -45,6 +53,27 @@ class CartManager{
         }else{
             return `Error: No matching cart was found with id#${cid}`
         }
+    }
+
+    //pendiente de terminar de desarrollar : no opera bien
+    async updateCart(cartId,prodsUpdateArray){
+        let allCarts = await this.getCarts()
+        let cartToUpdate = await this.getCartById(cartId)
+        console.log('el carrito a actualizar es: ',cartToUpdate)
+        let updateCartIndex = allCarts.findIndex(cart=>cart.cid === Number(cartId))
+        console.log('el index del carrito a actualizar es',updateCartIndex)
+        if(updateCartIndex === -1){
+            return `Error: No matching cart was found with id#${cartId}`
+        }
+
+        let updatedCart = {
+            ...cartToUpdate,
+            ...prodsUpdateArray,
+
+        }
+
+        console.log(updatedCart)
+        return `El carrito con id#${cid} fué actualizado exitosamente!.`
     }
 
     async deleteCart(cid){
@@ -70,17 +99,18 @@ class CartManager{
 
         matchingCart.products.splice(productToDeleteIndex,1)     
         return `Producto Borrado Correctamente!. Tu carrito actualizado es: ${JSON.stringify(matchingCart)}`
-        
     }
 }
 
 module.exports=CartManager
 
 //testing environment
-// let  cartManagerApp = async()=>{
-//     const cartFilePath = path.join(__dirname, "..", "dao", "carts.json")
-//     let cartManager = new CartManager(cartFilePath)
-//     try{
+let  cartManagerApp = async()=>{
+    const cartFilePath = path.join(__dirname, "..", "dao", "carts.json")
+    let cartManager = new CartManager(cartFilePath)
+     try{
+            console.log('cart update----->',await cartManager.updateCart(2,[{pid: '10', qty: 20},{pid: '20',qty: 2}]))
+
 //         console.log('FIRST GET CARTS: ',await cartManager.getCarts())
 //         await cartManager.createCartWithProducts([{pid:"1",qty:2},{pid:"4","qty":3},{pid:"8",qty:1}])
 //         console.log(await cartManager.getCarts())
@@ -96,12 +126,12 @@ module.exports=CartManager
 //         console.log('deleting cart: ',await cartManager.deleteCart(5))
 //         console.log('deleting cart: ',await cartManager.deleteCart(5))
 //         console.log('deleting cart: ',await cartManager.deleteCart(7))
-//     }catch(err){
-//         console.log(err.message)
-//         return
-//     }
-// }
-// cartManagerApp()
+    }catch(err){
+        console.log(err.message)
+        return
+    }
+}
+cartManagerApp()
 
 //testing
 //let carrito = new CartManager()
