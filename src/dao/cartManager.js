@@ -1,6 +1,9 @@
 const fs= require('fs');
 const { type } = require('os');
 const path= require('path')
+const ProductManager = require('./productManager')
+const allProducts = require('../data/products.json')
+
 
 class CartManager{
     static counter=1
@@ -17,6 +20,22 @@ class CartManager{
         }else{
             return []
         }       
+    }
+
+    async createCart(){
+        const allCarts = await this.getCarts()
+        const newCart={
+            cid:'tbd',
+            products:[]
+        }
+        if (allCarts.length===0){
+            newCart.cid=1
+        }else{
+            newCart.cid = carts[carts.length-1].cid+1
+        }
+        allCarts.push(newCart)
+        await fs.promises.writeFile(this.path, JSON.stringify(allCarts,null,2))
+        return `nuevo carrito con id#${newCart.cid} fue añadido. ahora hay ${allCarts.length} carrito(s) en total`
     }
 
     async createCartWithProducts(productsArr){
@@ -46,6 +65,7 @@ class CartManager{
     }
 
     async getCartById(cid){
+        // cid = Number(cid) testing to debug updatecart function
         const existingCarts = await this.getCarts()
         const matchingCart = existingCarts.find(cart=>cart.cid===cid)
         if(matchingCart){
@@ -55,24 +75,89 @@ class CartManager{
         }
     }
 
-    //pendiente de terminar de desarrollar : no opera bien
-    async updateCart(cartId,prodsUpdateArray){
+    //pendiente de terminar de desarrollar : no opera bien -- no entiendo q pasa me corre un codigo q esta comentado wtf
+
+    async updateCart(cartId,prodId){
+        //product validation
+       // console.log('LOS PRODUCTS JSON', Losproducts)
+        // console.log('DIRNAME:', __dirname)
+        // let thePath = path.join(__dirname, './productManager' )
+        // console.log('the path:', thePath)
+        // let productManager = await new ProductManager(thePath)
+        cartId = Number(cartId)
+        prodId = Number(prodId)
+        let productIsValid = allProducts.find(prod=>prod.id === prodId)
+        if(!productIsValid){
+            return `ERROR: El id# del producto que intentas agregar no existe, verificalo e intenta nuevamente`  
+        }
+        
+        //cart validation
+        // let allCarts = await this.getCarts()
+        let cartToUpdate = await this.getCartById(cartId)
+        console.log('el cart to update',cartToUpdate)
+        console.log('los products del cart to update ',cartToUpdate.products)
+        let indexProdToUpdate = cartToUpdate.products.findIndex(prod=> prod.pid === prodId)
+        if(indexProdToUpdate === -1){
+            let newProduct ={
+                pid: newProduct.prodId,
+                qty: 1
+            }
+            cartToUpdate.products.push(newProd)
+        }else{
+            cartToUpdate.products[indexProdToUpdate].qty + 1 
+        }
+
+        return `El carrito con id#${cid} fué actualizado exitosamente!.`
+
+    }
+
+    async updateCartManyProds(cartId,newProducts){
         let allCarts = await this.getCarts()
         let cartToUpdate = await this.getCartById(cartId)
-        console.log('el carrito a actualizar es: ',cartToUpdate)
-        let updateCartIndex = allCarts.findIndex(cart=>cart.cid === Number(cartId))
-        console.log('el index del carrito a actualizar es',updateCartIndex)
-        if(updateCartIndex === -1){
-            return `Error: No matching cart was found with id#${cartId}`
-        }
+        let productsDataPath =
 
-        let updatedCart = {
-            ...cartToUpdate,
-            ...prodsUpdateArray,
+        newProducts.forEach(newProd=>{
 
-        }
+           if(!newProd.pid){
+                return `Error: No es posible agregar un producto sin Id de Producto`
+           }
 
-        console.log(updatedCart)
+           //let validProducts = await productManager.getProducts() //connect w json
+           let productIsValid = validProducts.find(product => product.id === newProd.pid)
+           if(!productIsValid){
+                return `ERROR: El id# del producto que intentas agregar no existe, verificalo e intenta nuevamente`            
+           }
+
+           let newProduct = {
+            pid: newProduct.pid,
+            qty: newProduct.qty || 1
+           }
+
+           //Check if product exists in cart
+            //if yes exists ADD 1 
+            //IF NOt exist push  
+            let productAlreadyInCartIndex = cartToUpdate.products.findIndex(prod=>prod.pid === newProd.pid)
+            if(productAlreadyInCartIndex === -1){
+                cartToUpdate.push(newProduct)
+            }else{
+                cartToUpdate.products[productAlreadyInCartIndex].qty + 1
+            }
+        })
+
+        // console.log('el carrito a actualizar es: ',cartToUpdate)
+        // let updateCartIndex = allCarts.findIndex(cart=>cart.cid === Number(cartId))
+        // console.log('el index del carrito a actualizar es',updateCartIndex)
+        // if(updateCartIndex === -1){
+        //     return `Error: No matching cart was found with id#${cartId}`
+        // }
+
+        // let updatedCart = {
+        //     ...cartToUpdate,
+        //     ...prodsUpdateArray,
+
+        // }
+
+        // console.log(updatedCart)
         return `El carrito con id#${cid} fué actualizado exitosamente!.`
     }
 
@@ -109,7 +194,7 @@ let  cartManagerApp = async()=>{
     const cartFilePath = path.join(__dirname, "..", "dao", "carts.json")
     let cartManager = new CartManager(cartFilePath)
      try{
-            console.log('cart update----->',await cartManager.updateCart(2,[{pid: '10', qty: 20},{pid: '20',qty: 2}]))
+            console.log('cart update----->',await cartManager.updateCart(2,2))
 
 //         console.log('FIRST GET CARTS: ',await cartManager.getCarts())
 //         await cartManager.createCartWithProducts([{pid:"1",qty:2},{pid:"4","qty":3},{pid:"8",qty:1}])
