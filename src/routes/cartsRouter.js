@@ -5,7 +5,6 @@ const path = require('path');
 const router=Router()
 const cartsDataFilePath=path.join(__dirname,'..','data','carts.json')
 const cartManager = new CartManager(cartsDataFilePath)
-//console.log('cart manager -->', cartManager)
 
 router.get('/',async(req,res)=>{
     const carts=await cartManager.getCarts()
@@ -17,6 +16,20 @@ router.get('/:cid', async(req,res)=>{
     id=Number(id)
     try{
         const matchingCart = await cartManager.getCartById(id)
+        res.status(200).json(matchingCart)
+    }catch(err){
+        res.status(400).json({
+            error: err.error,
+            message: err.message
+        })
+    }
+})
+
+router.get('/prodsincart/:cid', async(req,res)=>{
+    let id=req.params.cid
+    id=Number(id)
+    try{
+        const matchingCart = await cartManager.getProductsInCartById(id)
         res.status(200).json(matchingCart)
     }catch(err){
         res.status(400).json({
@@ -52,5 +65,27 @@ router.put('/:cid/products/:pid', async(req,res)=>{
         })
     }
 })
+
+router.delete('/:cid', async(req,res)=>{
+    let cid = req.params.cid
+    cid=Number(cid)
+    try{
+        const cartToDelete = await cartManager.deleteCart(cid)
+        res.status(200).json(cartToDelete)
+    }catch(err){
+        return res.status(400).json({
+            error:err.error,
+            message:err.message
+        })
+    }
+})
+
+router.get("*",(req,res)=>{
+    res.setHeader('Content-Type','application/json');
+    res.status(404).json({
+        error:`Resource Not Found`,
+        message:`404 - The page you are trying to access does not exist. Please verify and try again.`
+    });
+});
 
 module.exports=router

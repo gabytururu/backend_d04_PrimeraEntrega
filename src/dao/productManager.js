@@ -3,15 +3,16 @@ const fs = require('fs');
 const path = require('path')
 
 class ProductManager {
-    static counter = 1
-
     constructor(filePath){
         this.path = filePath
     }
 
     async getProducts(){
         if(fs.existsSync(this.path)){
-            return JSON.parse(await fs.promises.readFile(this.path,'utf-8'))
+            let allProducts;
+            const productsFileContent = await fs.promises.readFile(this.path,'utf-8')
+            productsFileContent ? allProducts = JSON.parse(productsFileContent) : allProducts = []
+            return allProducts
         }else{
             return []
         }
@@ -36,7 +37,7 @@ class ProductManager {
         }
     }
 
-    async addProduct(productObj){         
+    async addProduct(productObj){               
             const product = {
                 id: 'tbd',
                 status: true,
@@ -58,21 +59,19 @@ class ProductManager {
                 }            
             }   
 
-            let existentProducts =[]
-            if(fs.existsSync(this.path)){
-                existentProducts = JSON.parse(await fs.promises.readFile(this.path,'utf-8'))
+            let existentProducts = await this.getProducts() 
+            if(existentProducts.length > 0){
                 product.id = existentProducts[existentProducts.length - 1].id + 1
             }else{
                 product.id = 1
-            }
-
+            }     
+           
             if(existentProducts.some(prod=>prod.code === product.code)){
                 return {
                     status: `ERROR`,
                     error: `ERROR: Product not added`,
                     message: `The product code you are trying to add has already been used. Please try again with a different code.`
-                }
-                
+                }  
             }
             
             existentProducts.push(product)
@@ -121,15 +120,21 @@ class ProductManager {
 
     async deleteProductById(id) {
         let allProducts = await this.getProducts()
+        if(allProducts.length === 0){
+            return {
+                status: `ERROR`,
+                error: `ERROR: Failed to delete Products`,
+                message: `There are no products created yet. Hence product id#${id} does not exist and could not be deleted.`
+            }        
+        }
         const productDeleteIndex = allProducts.findIndex(prod => prod.id === id)
-        
+        const productToDelete = allProducts[productDeleteIndex]
         if(productDeleteIndex === -1){
             return {
                 status: `ERROR`,
                 error: `ERROR: Failed to Delete product`,
                 message: `Failed to delete the requested product. The product Id#${id} does not exist. Please verify and try again.`
             }
-            // `ERROR: El producto que deseas borrar con el id#${id} no fue encontrado. Intenta nuevamente`
         }
         
         allProducts.splice(productDeleteIndex,1)
@@ -139,9 +144,8 @@ class ProductManager {
             status: `SUCCESS`,
             response: `SUCCESS: Product successfully deleted`,
             message: `Product with id#${id} was successfully deleted. This product will no longer appear in your product list`,
-            data: allProducts[productDeleteIndex]
+            data: productToDelete
         }
-        //`El Producto con Id#${id} fue borrado correctamente en del archivo`
     }
 }
 

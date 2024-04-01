@@ -18,7 +18,6 @@ router.get('/',async(req,res)=>{
 router.get('/:id',async(req,res)=>{
     let id = req.params.id
     numericId = Number(id)
-
     //tbd - explore moving validation to dao
     if(isNaN(numericId)){
         return res.status(400).json({
@@ -97,6 +96,4 @@ router.get("*",(req,res)=>{
         message:`404 - The page you are trying to access does not exist. Please verify and try again.`
     });
 });
-
-
 module.exports=router

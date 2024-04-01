@@ -1,7 +1,6 @@
 const fs= require('fs');
-const { type } = require('os');
 const path= require('path')
-const allProducts = require('../data/products.json')
+
 
 
 class CartManager{
@@ -10,8 +9,11 @@ class CartManager{
     }
 
     async getCarts(){
-        if(fs.existsSync(this.path)){
-            return JSON.parse(await fs.promises.readFile(this.path, 'utf-8'))
+        if(fs.existsSync(this.path)){        
+            let allCarts;
+            const cartsFileContent = await fs.promises.readFile(this.path,'utf-8')
+            cartsFileContent ? allCarts = JSON.parse(cartsFileContent) : allCarts = []
+            return allCarts
         }else{
             return []
         }       
@@ -21,14 +23,7 @@ class CartManager{
         const existingCarts = await this.getCarts()
         const matchingCart = existingCarts.find(cart=>cart.cid===cid)
         if(matchingCart){
-            // return {
-            //     status: `SUCCESS`,
-            //     response: `SUCCESS: Cart successfully found`,
-            //     message: `Cart with id#${cid} was successfully found`,
-            //     data: matchingCart
-            // }
-            return matchingCart
-            
+            return matchingCart            
         }else{
             return {
                 status: `ERROR`,
@@ -77,21 +72,23 @@ class CartManager{
             }
         }
         if(matchingCart.products.length > 0){
-            // return {
-            //     status: `SUCCESS`,
-            //     response: `SUCCESS: Products successfully retrieved`,
-            //     message: `Products contained in cart id#${cid} were successfully retrieved`,
-            //     data: matchingCart.products
-            // }             
-            return matchingCart.products
-                   
+            return matchingCart.products                   
         }
     }
 
     async updateCart(cartId,prodId){
         cartId = Number(cartId)
         prodId = Number(prodId)
-        
+
+        let allProducts;
+        let allProductsLocationPath = path.join(__dirname,'..','data','products.json')
+        if(fs.existsSync(allProductsLocationPath)){
+            const prodsFileContent = await fs.promises.readFile(allProductsLocationPath,'utf-8')
+            prodsFileContent ? allProducts = JSON.parse(prodsFileContent) : allProducts=[]
+        }else{
+            allProducts = []
+        }
+
         let productIsValid = allProducts.find(prod=>prod.id === prodId)
         if(!productIsValid || isNaN(prodId)){
             return  {
@@ -137,15 +134,15 @@ class CartManager{
 
     async deleteCart(cid){
         let allCarts = await this.getCarts()
-        console.log(allCarts)
         if(allCarts.length === 0){
             return {
                 status: `ERROR`,
                 error: `ERROR: Failed to delete cart`,
-                message: `There are no carts created. Hence cart id#${cid} does not exist.`
+                message: `There are no carts created. Hence cart id#${cid} does not exist and could not be deleted.`
             }        
         }
-        const cartToDeleteIndex = allCarts.findIndex(cart=>cart.cid===cid)        
+        const cartToDeleteIndex = allCarts.findIndex(cart=>cart.cid===cid)    
+        const cartToDelete = allCarts[cartToDeleteIndex]    
         if(cartToDeleteIndex === -1){
             console.log('el cart to delete index es-->',cartToDeleteIndex)
             return {
@@ -160,7 +157,7 @@ class CartManager{
             status: `SUCCESS`,
             response: `SUCCESS: Product successfully deleted`,
             message: `The cart with id#${cid} was successfully deleted and will no longer exist.`,
-            data: allCarts[cartToDeleteIndex]
+            data: cartToDelete
         }
     }
 }
@@ -173,15 +170,15 @@ module.exports=CartManager
 //     const cartFilePath = path.join(__dirname, "..", "data", "carts.json")
 //     let cartManager = new CartManager(cartFilePath)
 //     try{
-//         //console.log('update cart by id:', await cartManager.updateCart(5,7))
-//         console.log('delet ecart:', await cartManager.deleteCart(5))
+//         console.log('update cart by id:', await cartManager.updateCart(4,5))
+//         //console.log('delet ecart:', await cartManager.deleteCart(5))
 //     }catch(err){
 //         console.log(err.message)
 //         return
 //     }
 // }
 
-//cartManagerApp()
+// cartManagerApp()
 // let  cartManagerApp = async()=>{
 //     const cartFilePath = path.join(__dirname, "..", "data", "carts.json")
 //     let cartManager = new CartManager(cartFilePath)
