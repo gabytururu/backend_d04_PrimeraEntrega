@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "status": true,
+    "title": "producto prueba",
+    "description": "Este es un producto de prueba",
+    "price": 200,
+    "thumbnails": "img path tbd",
+    "code": "111",
+    "stock": 2
+  },
+  {
+    "id": 2,
+    "status": true,
+    "title": "cambios con put ",
+    "description": "cambios de stock hechos con PUT final testing",
+    "price": 200,
+    "thumbnails": "img path tbd",
+    "code": "222",
+    "stock": 200
+  },
+  {
+    "id": 4,
+    "status": true,
+    "title": "cambios con put ",
+    "description": "cambios de stock hechos con PUT final testing",
+    "price": 200,
+    "thumbnails": "img path tbd",
+    "code": "444",
+    "stock": 450
+  },
+  {
+    "id": 5,
+    "status": true,
+    "title": "producto prueba",
+    "description": "Este es un producto de prueba",
+    "price": 200,
+    "thumbnails": "img path tbd",
+    "code": "555",
+    "stock": 2
+  }
+]

@@ -96,4 +96,5 @@ router.get("*",(req,res)=>{
         message:`404 - The page you are trying to access does not exist. Please verify and try again.`
     });
 });
+
 module.exports=router
