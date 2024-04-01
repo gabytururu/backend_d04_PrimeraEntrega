@@ -1,7 +1,16 @@
 [
   {
     "cid": 1,
-    "products": []
+    "products": [
+      {
+        "pid": "10",
+        "qty": 1
+      },
+      {
+        "pid": "11",
+        "qty": 3
+      }
+    ]
   },
   {
     "cid": 2,
@@ -14,15 +23,6 @@
   {
     "cid": 4,
     "products": []
-  },
-  {
-    "cid": 5,
-    "products": [
-      {
-        "pid": "7",
-        "qty": 2
-      }
-    ]
   },
   {
     "cid": 6,
@@ -47,7 +47,20 @@
   },
   {
     "cid": 8,
-    "products": []
+    "products": [
+      {
+        "pid": "11",
+        "qty": 3
+      },
+      {
+        "pid": "13",
+        "qty": 1
+      },
+      {
+        "pid": "15",
+        "qty": 4
+      }
+    ]
   },
   {
     "cid": 9,
@@ -67,6 +80,18 @@
   },
   {
     "cid": 13,
+    "products": []
+  },
+  {
+    "cid": 14,
+    "products": []
+  },
+  {
+    "cid": 15,
+    "products": []
+  },
+  {
+    "cid": 16,
     "products": []
   }
 ]

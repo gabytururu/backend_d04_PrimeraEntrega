@@ -38,7 +38,7 @@ router.post('/',async(req,res)=>{
     }   
 })
 
-router.post('/:cid/products/:pid', async(req,res)=>{
+router.put('/:cid/products/:pid', async(req,res)=>{
     let {cid, pid} = req.params
     cid=Number(cid)
     pid=Number(pid)

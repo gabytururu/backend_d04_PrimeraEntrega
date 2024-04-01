@@ -21,12 +21,14 @@ class CartManager{
         const existingCarts = await this.getCarts()
         const matchingCart = existingCarts.find(cart=>cart.cid===cid)
         if(matchingCart){
-            return {
-                status: `SUCCESS`,
-                response: `SUCCESS: Cart successfully found`,
-                message: `Cart with id#${cid} was successfully found`,
-                data: matchingCart
-            }
+            // return {
+            //     status: `SUCCESS`,
+            //     response: `SUCCESS: Cart successfully found`,
+            //     message: `Cart with id#${cid} was successfully found`,
+            //     data: matchingCart
+            // }
+            return matchingCart
+            
         }else{
             return {
                 status: `ERROR`,
@@ -75,12 +77,14 @@ class CartManager{
             }
         }
         if(matchingCart.products.length > 0){
-            return {
-                status: `SUCCESS`,
-                response: `SUCCESS: Products successfully retrieved`,
-                message: `Products contained in cart id#${cid} were successfully retrieved`,
-                data: matchingCart.products
-            }             
+            // return {
+            //     status: `SUCCESS`,
+            //     response: `SUCCESS: Products successfully retrieved`,
+            //     message: `Products contained in cart id#${cid} were successfully retrieved`,
+            //     data: matchingCart.products
+            // }             
+            return matchingCart.products
+                   
         }
     }
 
@@ -107,19 +111,15 @@ class CartManager{
             }        
         }
 
-        let cartToUpdate = await this.getCartById(cartId)
-        console.log('el cart to update',cartToUpdate)
-        let cartToUpdateIndex = allCarts.findIndex(cart=>cart.cid === cartId)
-        console.log('cart to update index',cartToUpdateIndex)
+        let cartToUpdate = await this.getCartById(cartId)       
+        let cartToUpdateIndex = allCarts.findIndex(cart=>cart.cid === cartId)      
         let updatedProdObject ={
             pid: prodId.toString(),
             qty: 1
         }
 
-        console.log('cart to update products ',cartToUpdate.data.products)
-        let prodToUpdateIndex = cartToUpdate.data.products.findIndex(prod=>prod.pid === prodId.toString())
-        console.log('prop to update index',prodToUpdateIndex)
-         if(prodToUpdateIndex === -1){
+        let prodToUpdateIndex = cartToUpdate.products.findIndex(prod=>prod.pid === prodId.toString())
+        if(prodToUpdateIndex === -1){
             cartToUpdate.products.push(updatedProdObject)
         }else{
             cartToUpdate.products[prodToUpdateIndex].qty++
@@ -169,18 +169,19 @@ module.exports=CartManager
 
 //testing environment
 
-let cartManagerApp = async()=>{
-    const cartFilePath = path.join(__dirname, "..", "data", "carts.json")
-    let cartManager = new CartManager(cartFilePath)
-    try{
-        console.log('update cart by id:', await cartManager.updateCart(5,7))
-    }catch(err){
-        console.log(err.message)
-        return
-    }
-}
+// let cartManagerApp = async()=>{
+//     const cartFilePath = path.join(__dirname, "..", "data", "carts.json")
+//     let cartManager = new CartManager(cartFilePath)
+//     try{
+//         //console.log('update cart by id:', await cartManager.updateCart(5,7))
+//         console.log('delet ecart:', await cartManager.deleteCart(5))
+//     }catch(err){
+//         console.log(err.message)
+//         return
+//     }
+// }
 
-cartManagerApp()
+//cartManagerApp()
 // let  cartManagerApp = async()=>{
 //     const cartFilePath = path.join(__dirname, "..", "data", "carts.json")
 //     let cartManager = new CartManager(cartFilePath)
