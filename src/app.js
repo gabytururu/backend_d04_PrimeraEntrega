@@ -20,8 +20,8 @@ const app=express()
 
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
-app.use("/api/productos/", productsRouter)  
-app.use("/api/carritos/", cartsRouter)
+app.use("/api/products/", productsRouter)  
+app.use("/api/carts/", cartsRouter)
 
 //-----------------------Prods endpoints ------------------------//
 // app.get("/productos/",async(req,res)=>{

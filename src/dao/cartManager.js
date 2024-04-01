@@ -17,6 +17,25 @@ class CartManager{
         }       
     }
 
+    async getCartById(cid){
+        const existingCarts = await this.getCarts()
+        const matchingCart = existingCarts.find(cart=>cart.cid===cid)
+        if(matchingCart){
+            return {
+                status: `SUCCESS`,
+                response: `SUCCESS: Cart successfully found`,
+                message: `Cart with id#${cid} was successfully found`,
+                data: matchingCart
+            }
+        }else{
+            return {
+                status: `ERROR`,
+                error: `ERROR: Cart was not found`,
+                message: `Failed to find cart with Id#${cid}. This id# is not associated to any listed carts. Please verify and try again.`
+            }
+        }
+    }
+
     async createCart(){
         const allCarts = await this.getCarts()
         const newCart={
@@ -30,16 +49,11 @@ class CartManager{
         }
         allCarts.push(newCart)
         await fs.promises.writeFile(this.path, JSON.stringify(allCarts,null,2))
-        return `SUCCESS: New cart with id#${newCart.cid} was successfully created.`
-    }
-
-    async getCartById(cid){
-        const existingCarts = await this.getCarts()
-        const matchingCart = existingCarts.find(cart=>cart.cid===cid)
-        if(matchingCart){
-            return matchingCart
-        }else{
-            return `ERROR: No matching cart was found with id#${cid}`
+        return {
+            status: `SUCCESS`,
+            response: `SUCCESS: New cart successfully created`,
+            message: `A new cart with id#${newCart.cid} was successfully created. You now have a total of ${allCarts.length} carts listed`,
+            data: newCart
         }
     }
 
@@ -47,13 +61,26 @@ class CartManager{
         const existingCarts = await this.getCarts()
         const matchingCart = existingCarts.find(cart=>cart.cid===cid)
         if(!matchingCart){
-            return `ERROR: No matching cart was found with id#${cid}`
+            return {
+                status: `ERROR`,
+                error: `ERROR: Requested cart was not found`,
+                message: `No matching cart was found with the id#${cid}. Please try again with a different id#.`
+            }
         }
         if(matchingCart.products.length === 0){
-            return `ERROR: The cart you are trying to access is empty. Please try again. Make sure you request a cart that contains at least 1 product`
+            return {
+                status: `ERROR`,
+                error: `ERROR: Cart is empty`,
+                message: `The cart you are trying to access does exist but has no products. Please try again. Make sure you request a cart that contains at least 1 product`
+            }
         }
         if(matchingCart.products.length > 0){
-            return matchingCart.products
+            return {
+                status: `SUCCESS`,
+                response: `SUCCESS: Products successfully retrieved`,
+                message: `Products contained in cart id#${cid} were successfully retrieved`,
+                data: matchingCart.products
+            }             
         }
     }
 
@@ -63,22 +90,35 @@ class CartManager{
         
         let productIsValid = allProducts.find(prod=>prod.id === prodId)
         if(!productIsValid || isNaN(prodId)){
-            return `ERROR: The product id provided (id#${prodId}) does not exist. Please verify and try again` 
+            return  {
+                status: `ERROR`,
+                error: `ERROR: Product id provided is invalid`,
+                message: `Failed to update cart with Id#${cartId} due to invalid argument: The product id provided (id#${prodId}) does not exist. Please verify and try again`
+            }        
         }    
        
         let allCarts = await this.getCarts()
         let cartIsValid = allCarts.find(cart=>cart.cid===cartId)
         if(!cartIsValid){
-            return `ERROR: The cart id provided (cart#${cartId} does not exist. Please verify and try again` 
+            return {
+                status: `ERROR`,
+                error: `ERROR: Cart id provided is invalid`,
+                message: `Failed to update cart with Id#${cartId} due to invalid argument: The cart id provided (id#${cartId}) does not exist. Please verify and try again`
+            }        
         }
 
         let cartToUpdate = await this.getCartById(cartId)
+        console.log('el cart to update',cartToUpdate)
         let cartToUpdateIndex = allCarts.findIndex(cart=>cart.cid === cartId)
+        console.log('cart to update index',cartToUpdateIndex)
         let updatedProdObject ={
             pid: prodId.toString(),
             qty: 1
         }
-        let prodToUpdateIndex = cartToUpdate.products.findIndex(prod=>prod.pid === prodId.toString())
+
+        console.log('cart to update products ',cartToUpdate.data.products)
+        let prodToUpdateIndex = cartToUpdate.data.products.findIndex(prod=>prod.pid === prodId.toString())
+        console.log('prop to update index',prodToUpdateIndex)
          if(prodToUpdateIndex === -1){
             cartToUpdate.products.push(updatedProdObject)
         }else{
@@ -87,36 +127,67 @@ class CartManager{
 
         allCarts[cartToUpdateIndex] = cartToUpdate        
         await fs.promises.writeFile(this.path, JSON.stringify(allCarts,null,2))
-        return `SUCCESS: The cart with id#${cartId} was successfully updated!`
+        return {
+            status: `SUCCESS`,
+            response: `SUCCESS: Cart successfully updated`,
+            message: `The products with id#${prodId} contained in cart with id#${cartId} were successfully updated`,
+            data: cartToUpdate
+        }
     }
 
     async deleteCart(cid){
         let allCarts = await this.getCarts()
         console.log(allCarts)
-        if(!allCarts){
-            return 
+        if(allCarts.length === 0){
+            return {
+                status: `ERROR`,
+                error: `ERROR: Failed to delete cart`,
+                message: `There are no carts created. Hence cart id#${cid} does not exist.`
+            }        
         }
         const cartToDeleteIndex = allCarts.findIndex(cart=>cart.cid===cid)        
         if(cartToDeleteIndex === -1){
             console.log('el cart to delete index es-->',cartToDeleteIndex)
-            return `ERROR: The cart with id#${cid} does not exist, hence, cannot be deleted. Please verify and try again.`
+            return {
+                status: `ERROR`,
+                error: `ERROR: Failed to delete cart`,
+                message: `The cart with id#${cid} does not exist, hence, cannot be deleted. Please verify and try again.`
+            }        
         }
         allCarts.splice(cartToDeleteIndex,1)       
         await fs.promises.writeFile(this.path, JSON.stringify(allCarts,null,2))
-        return `SUCCESS: The cart with id#${cid} was successfully deleted.`
+        return {
+            status: `SUCCESS`,
+            response: `SUCCESS: Product successfully deleted`,
+            message: `The cart with id#${cid} was successfully deleted and will no longer exist.`,
+            data: allCarts[cartToDeleteIndex]
+        }
     }
 }
    
 module.exports=CartManager
 
 //testing environment
-let  cartManagerApp = async()=>{
+
+let cartManagerApp = async()=>{
     const cartFilePath = path.join(__dirname, "..", "data", "carts.json")
     let cartManager = new CartManager(cartFilePath)
-    //console.log('el cart Manager Creado',cartManager)
+    try{
+        console.log('update cart by id:', await cartManager.updateCart(5,7))
+    }catch(err){
+        console.log(err.message)
+        return
+    }
+}
 
-     try{
-        console.log('getprodsincartbyid', await cartManager.getProductsInCartById(10))
+cartManagerApp()
+// let  cartManagerApp = async()=>{
+//     const cartFilePath = path.join(__dirname, "..", "data", "carts.json")
+//     let cartManager = new CartManager(cartFilePath)
+//     //console.log('el cart Manager Creado',cartManager)
+
+//      try{
+//         console.log('getprodsincartbyid', await cartManager.getProductsInCartById(10))
         //console.log('get cart by id:', await cartManager.getCartById(6))
         //console.log('update cart by id:', await cartManager.updateCart(5,7))
         // await cartManager.getCarts()
@@ -144,12 +215,12 @@ let  cartManagerApp = async()=>{
 //         console.log('deleting cart: ',await cartManager.deleteCart(5))
 //         console.log('deleting cart: ',await cartManager.deleteCart(5))
 
-    }catch(err){
-        console.log(err.message)
-        return
-    }
-}
-cartManagerApp()
+//     }catch(err){
+//         console.log(err.message)
+//         return
+//     }
+// }
+// cartManagerApp()
 
 //testing
 //let carrito = new CartManager()

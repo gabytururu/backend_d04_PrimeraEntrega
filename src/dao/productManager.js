@@ -1,3 +1,4 @@
+const { error } = require('console');
 const fs = require('fs');
 const path = require('path')
 
@@ -16,6 +17,25 @@ class ProductManager {
         }
     }
 
+    async getProductById(id){   
+        const products = await this.getProducts()
+        const matchingProduct = products.find(prod=> prod.id===id)
+        if(matchingProduct){
+            return {
+                status: `SUCCESS`,
+                response: `SUCCESS: Product successfully found`,
+                message: `Product with id#${matchingProduct.id} was successfully found`,
+                data: matchingProduct
+            }
+        }else{
+            return {
+                status: `ERROR`,
+                error: `ERROR: Product was not found`,
+                message: `Failed to find product with Id#${id}. This id# is not associated to any listed products. Please verify and try again.`
+            }
+        }
+    }
+
     async addProduct(productObj){         
             const product = {
                 id: 'tbd',
@@ -30,7 +50,11 @@ class ProductManager {
     
             for(const property in product){
                 if(product[property] === undefined){
-                    return `ERROR: Producto no agregado - Te faltó proporcionar la propiedad "${property.toUpperCase()}" del producto. Intenta Nuevamente`
+                    return {
+                        status: `ERROR`,
+                        error: `ERROR: Product was not added`,
+                        message: `Failed to complete product adding submition due to missing property: ${property.toUpperCase()}. Please verify and try again. Make sure you include all mandatory properties to avoid failures.`
+                    }
                 }            
             }   
 
@@ -43,44 +67,56 @@ class ProductManager {
             }
 
             if(existentProducts.some(prod=>prod.code === product.code)){
-                return `ERROR: Producto no agregado - El CÓDIGO(CODE) de producto ya fue usado antes, intenta nuevamente`
+                return {
+                    status: `ERROR`,
+                    error: `ERROR: Product not added`,
+                    message: `The product code you are trying to add has already been used. Please try again with a different code.`
+                }
+                
             }
             
             existentProducts.push(product)
             await fs.promises.writeFile(this.path,JSON.stringify(existentProducts, null, 2))           
     
-            return `El producto con id#${product.id} y código #${product.code} fue agregado correctamente, Ahora hay ${existentProducts.length} productos en total`
+            return {
+                status: `SUCCESS`,
+                response: `SUCCESS: Product successfully added`,
+                message: `Product with id#${product.id} and code ${product.code} was successfully added. You now have a total of ${existentProducts.length} products`,
+                data: product
+            }
     }
     
-    async getProductById(id){   
-        const products = await this.getProducts()
-        const matchingProduct = products.find(prod=> prod.id===id)
-        if(matchingProduct){
-            return matchingProduct
-        }else{
-            return `ERROR: Producto no encontrado - el Id#${id} no está asociado a ningún producto. Intenta nuevamente`
-        }
-    }
-
     async updateProductById(id, updatedPropsObj) {
         let allProducts = await this.getProducts()
         const updateProductIndex = allProducts.findIndex(prod => prod.id === id)
 
         if(updateProductIndex === -1){
-            console.log(`ERROR: El producto que deseas actualizar con el id#${id} no fue encontrado. Intenta nuevamente`)
-            return
+            return {
+                status: `ERROR`,
+                error: `ERROR: Product update was not completed`,
+                message: `Failed to update product with Id#${id}. Product does not exist. Please verify and try again.`
+            }        
         }
 
         for(let prop in updatedPropsObj){
             if (prop === 'id'){
-                return `Error: Actualización bloqueada. No es posible cambiar el id# de los productos. Intenta nuevamente, omite enviar datos de cambio de Id`
+                return {
+                    status: `ERROR`,
+                    error: `ERROR: Invalid Action - Update request was blocked`,
+                    message: `Failed to update product due to invalid action. The Id# of a product cannot be changed. Please verify and resubmit.`
+                }
             }
             if(prop !== 'id'){
                 allProducts[updateProductIndex][prop] = updatedPropsObj[prop]
             }
         }        
         await fs.promises.writeFile(this.path, JSON.stringify(allProducts, null, 2))
-        return `El producto con el id#${id} fue actualizado correctamente`
+        return {
+            status: `SUCCESS`,
+            response: `SUCCESS: Product successfully updated`,
+            message: `Product with id#${id} was successfully updated`,
+            data: allProducts[updateProductIndex]
+        }
     }
 
     async deleteProductById(id) {
@@ -88,13 +124,24 @@ class ProductManager {
         const productDeleteIndex = allProducts.findIndex(prod => prod.id === id)
         
         if(productDeleteIndex === -1){
-            return `ERROR: El producto que deseas borrar con el id#${id} no fue encontrado. Intenta nuevamente`
+            return {
+                status: `ERROR`,
+                error: `ERROR: Failed to Delete product`,
+                message: `Failed to delete the requested product. The product Id#${id} does not exist. Please verify and try again.`
+            }
+            // `ERROR: El producto que deseas borrar con el id#${id} no fue encontrado. Intenta nuevamente`
         }
         
         allProducts.splice(productDeleteIndex,1)
         await fs.promises.writeFile(this.path, JSON.stringify(allProducts,null,2))
     
-        return `El Producto con Id#${id} fue borrado correctamente en del archivo`
+        return {
+            status: `SUCCESS`,
+            response: `SUCCESS: Product successfully deleted`,
+            message: `Product with id#${id} was successfully deleted. This product will no longer appear in your product list`,
+            data: allProducts[productDeleteIndex]
+        }
+        //`El Producto con Id#${id} fue borrado correctamente en del archivo`
     }
 }
 

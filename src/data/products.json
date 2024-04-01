@@ -9,39 +9,12 @@
     "stock": 25
   },
   {
-    "id": 2,
-    "title": "producto prueba 2",
-    "description": "Este es un producto prueba",
-    "price": 200,
-    "thumbnail": "Sin imagen",
-    "code": "222",
-    "stock": 45
-  },
-  {
-    "id": 3,
-    "title": "producto prueba 3",
-    "description": "Este es un producto prueba",
-    "price": 300,
-    "thumbnail": "Sin imagen",
-    "code": "333",
-    "stock": 55
-  },
-  {
     "id": 5,
     "title": "producto prueba 5",
     "description": "actualizando stock usando PUT Endpoint",
     "price": 500,
     "thumbnail": "Sin imagen",
     "code": "555",
-    "stock": 400
-  },
-  {
-    "id": 6,
-    "title": "producto prueba 6",
-    "description": "actualizando stock usando PUT Endpoint",
-    "price": 600,
-    "thumbnail": "Sin imagen",
-    "code": "667",
     "stock": 400
   },
   {
@@ -107,5 +80,105 @@
     "thumbnails": "tbd",
     "code": "7777",
     "stock": 45
+  },
+  {
+    "id": 15,
+    "status": true,
+    "title": "producto prueba z",
+    "description": "Este es un producto prueba",
+    "price": 200,
+    "thumbnails": "tbd",
+    "code": "474",
+    "stock": 45
+  },
+  {
+    "id": 16,
+    "status": true,
+    "title": "producto prueba z",
+    "description": "Este es un producto prueba",
+    "price": 200,
+    "thumbnails": "tbd",
+    "code": "858585",
+    "stock": 45
+  },
+  {
+    "id": 17,
+    "status": true,
+    "title": "producto prueba z",
+    "description": "Este es un producto prueba",
+    "price": 200,
+    "thumbnails": "tbd",
+    "code": "858",
+    "stock": 45
+  },
+  {
+    "id": 18,
+    "status": true,
+    "title": "producto prueba z",
+    "description": "Este es un producto prueba",
+    "price": 200,
+    "thumbnails": "tbd",
+    "code": "74",
+    "stock": 26
+  },
+  {
+    "id": 19,
+    "status": true,
+    "title": "producto prueba z",
+    "description": "Este es un producto prueba",
+    "price": 200,
+    "thumbnails": "tbd",
+    "code": "94",
+    "stock": 26
+  },
+  {
+    "id": 20,
+    "status": true,
+    "title": "producto prueba z",
+    "description": "Este es un producto prueba",
+    "price": 200,
+    "thumbnails": "tbd",
+    "code": "940",
+    "stock": 26
+  },
+  {
+    "id": 21,
+    "status": true,
+    "title": "abcd cambios con put con nueva response",
+    "description": "cambios hechos con PUT",
+    "price": 200,
+    "thumbnails": "tbd",
+    "code": "9400",
+    "stock": 3
+  },
+  {
+    "id": 22,
+    "status": true,
+    "title": "producto prueba z",
+    "description": "Este es un producto prueba",
+    "price": 200,
+    "thumbnails": "tbd",
+    "code": "94010",
+    "stock": 26
+  },
+  {
+    "id": 23,
+    "status": true,
+    "title": "abcd cambios con put con nueva response",
+    "description": "cambios hechos con PUT",
+    "price": 200,
+    "thumbnails": "tbd",
+    "code": "902010",
+    "stock": 30
+  },
+  {
+    "id": 24,
+    "status": true,
+    "title": "producto prueba z bla bla car",
+    "description": "Este es un producto prueba",
+    "price": 200,
+    "thumbnails": "tbd",
+    "code": "asdf",
+    "stock": 26
   }
 ]
